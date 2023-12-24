@@ -18,33 +18,23 @@ const globe = new THREE.Mesh( geometry, material );
 
 //Mouse movement
 scene.add(globe);
-let autoRotate = true;
-const rotationSpeed = 0.07;
-let targetRotation = { x: 0, y: 0 };
-let currentRotation = { x: 0, y: 0 };
+const rotationSpeed = 0.05;
 
 function updateRotation() {
-	if (autoRotate) {
-	  globe.rotation.y += 0.001;
-	  currentRotation.y += 0.001;
-	  targetRotation.y = currentRotation.y;
-	} 
-	else {
-	  globe.rotation.x += (targetRotation.x - globe.rotation.x) * rotationSpeed;
-	  globe.rotation.y += (targetRotation.y - globe.rotation.y) * rotationSpeed;
-	}
+	globe.rotation.x += (targetRotation.x - globe.rotation.x) * rotationSpeed;
+	globe.rotation.y += (targetRotation.y - globe.rotation.y) * rotationSpeed;
 }
 
 //Mouse Tracker
 let isLeftButtonDown = false;
-let prevMousePosition = { x: 0, y: 0 };
+let targetRotation = { x: 0, y: 0 };
+let previousMousePosition = { x: 0, y: 0 };
 
 addEventListener('mousedown', (event) => {
 	if (event.button === 0) {
 	  isLeftButtonDown = true;
-	  autoRotate = false;
   
-	  prevMousePosition = {
+	  previousMousePosition = {
 		x: event.clientX / window.innerWidth * 2 - 1,
 		y: (event.clientY / window.innerHeight) * 2 + 1
 	  };
@@ -53,20 +43,19 @@ addEventListener('mousedown', (event) => {
 addEventListener('mouseup', (event) => {
 	if (event.button === 0) {
 		isLeftButtonDown = false;
-		autoRotate = true;
 	}
 });
 addEventListener('mousemove', (event) => {
 	if (isLeftButtonDown) {
-	  const currMousePoisition = {
+	  const currentMousePosition = {
 		x: event.clientX / window.innerWidth * 2 - 1,
 		y: (event.clientY / window.innerHeight) * 2 + 1
 	  };
   
-	  targetRotation.y += currMousePoisition.x - prevMousePosition.x;
-	  targetRotation.x += currMousePoisition.y - prevMousePosition.y;
+	  targetRotation.y += currentMousePosition.x - previousMousePosition.x;
+	  targetRotation.x += currentMousePosition.y - previousMousePosition.y;
   
-	  prevMousePosition = currMousePoisition;
+	  previousMousePosition = currentMousePosition;
 	}
 });
   
