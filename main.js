@@ -17,36 +17,42 @@ const material = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().l
 const globe = new THREE.Mesh( geometry, material );
 
 //Mouse movement
-scene.add(globe);
-const rotationSpeed = 0.05;
-
-function updateRotation() {
-	globe.rotation.x += (targetRotation.x - globe.rotation.x) * rotationSpeed;
-	globe.rotation.y += (targetRotation.y - globe.rotation.y) * rotationSpeed;
-}
+const group = new THREE.Group();
+group.add(globe);
+scene.add(group);
+const rotationSpeed = 0.08;
+let autoRotate = true;
+let targetRotation = { x: 0, y: 0 };
 
 //Mouse Tracker
 let isLeftButtonDown = false;
-let targetRotation = { x: 0, y: 0 };
 let previousMousePosition = { x: 0, y: 0 };
+let cursorOnGlobe = false;
 
 addEventListener('mousedown', (event) => {
-	if (event.button === 0) {
-	  isLeftButtonDown = true;
-  
-	  previousMousePosition = {
-		x: event.clientX / window.innerWidth * 2 - 1,
-		y: (event.clientY / window.innerHeight) * 2 + 1
-	  };
-	}
+    {if (event.button === 0) {
+        isLeftButtonDown = true;
+		autoRotate = false;
+
+        previousMousePosition = {
+            x: event.clientX / window.innerWidth * 2 - 1,
+            y: event.clientY / window.innerHeight * 2 + 1
+        };
+
+        checkIfClickedOnGlobe(event);
+		if (!cursorOnGlobe) {
+            autoRotate = true;
+        }
+    }}
 });
 addEventListener('mouseup', (event) => {
 	if (event.button === 0) {
 		isLeftButtonDown = false;
+		autoRotate = true;
 	}
 });
 addEventListener('mousemove', (event) => {
-	if (isLeftButtonDown) {
+	if (isLeftButtonDown && cursorOnGlobe) {
 	  const currentMousePosition = {
 		x: event.clientX / window.innerWidth * 2 - 1,
 		y: (event.clientY / window.innerHeight) * 2 + 1
@@ -58,6 +64,26 @@ addEventListener('mousemove', (event) => {
 	  previousMousePosition = currentMousePosition;
 	}
 });
+
+addEventListener('wheel', (event) => {
+    if (cursorOnGlobe) {
+        autoRotate = false;
+        const scrollSpeed = 0.001;
+
+        const verticalChange = event.deltaY;
+        targetRotation.x += -verticalChange * scrollSpeed;
+        const horizontalChange = event.deltaX;
+        targetRotation.y += -horizontalChange * scrollSpeed;
+
+        if (event.target === renderer.domElement) {
+            event.preventDefault();
+        }
+
+		setTimeout(() => {
+            autoRotate = true;
+        }, 500);
+    }
+}, { passive: false });
   
 //Animate
 camera.position.z = 15;
@@ -67,3 +93,32 @@ function animate() {
   	renderer.render(scene, camera);
 }
 animate();
+
+//Functions
+function updateRotation() {
+	if (autoRotate) {
+	  globe.rotation.y += 0.001;
+	} 
+	else {
+	  group.rotation.x += (targetRotation.x - group.rotation.x) * rotationSpeed;
+	  group.rotation.y += (targetRotation.y - group.rotation.y) * rotationSpeed;
+	}
+}
+
+function checkIfClickedOnGlobe(event) {
+    const mouse = new THREE.Vector2();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = raycaster.intersectObject(globe);
+
+    if (intersects.length > 0) {
+        cursorOnGlobe = true;
+    } 
+	else {
+        cursorOnGlobe = false;
+    }
+}
