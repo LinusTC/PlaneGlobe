@@ -81,12 +81,12 @@ addEventListener('wheel', (event) => {
 
 		setTimeout(() => {
             autoRotate = true;
-        }, 500);
+        }, 1);
     }
 }, { passive: false });
   
 //Animate
-camera.position.z = 15;
+camera.position.z = 16;
 function animate() {
 	requestAnimationFrame(animate);
   	updateRotation();
