@@ -68,7 +68,7 @@ addEventListener('mousemove', (event) => {
 addEventListener('wheel', (event) => {
     if (cursorOnGlobe) {
         autoRotate = false;
-        const scrollSpeed = 0.001;
+        const scrollSpeed = 0.003;
 
         const verticalChange = event.deltaY;
         targetRotation.x += -verticalChange * scrollSpeed;
@@ -86,7 +86,7 @@ addEventListener('wheel', (event) => {
 }, { passive: false });
   
 //Animate
-camera.position.z = 16;
+camera.position.z = 15;
 function animate() {
 	requestAnimationFrame(animate);
   	updateRotation();
