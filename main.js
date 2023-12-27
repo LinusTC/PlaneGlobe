@@ -86,27 +86,13 @@ addEventListener('wheel', (event) => {
     }
 }, { passive: false });
 
-function addPingsWithDelay() {
-	for (let i = 0; i < 4; i++) {
-	  setTimeout(() => {
-		switch (i) {
-		  case 0:
-			addPing(-74.00597, 40.71427, 0x00ff00); // New York
-			break;
-		  case 1:
-			addPing(13.41053, 52.52437, 0x00ff00); // Berlin
-			break;
-		  case 2:
-			addPing(114.16, 22.3, 0x00ff00); // Hong Kong
-			break;
-		  case 3:
-			addPing(-122.41, 37.77, 0x00ff00); // San Fran
-			break;
-		}
-	  }, i * 1000); // Multiply by 1000 to convert seconds to milliseconds
-	}
-  }
-addPingsWithDelay();
+	addPing(-74.00597, 40.71427, 0x00ff00); // New York
+
+	addPing(13.41053, 52.52437, 0x00ff00); // Berlin
+
+	addPing(114.16, 22.3, 0x00ff00); // Hong Kong
+
+	addPing(-122.41, 37.77, 0x00ff00); // San Fran
 
 //Animate
 camera.position.z = 15;
