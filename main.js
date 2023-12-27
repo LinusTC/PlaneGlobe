@@ -14,7 +14,7 @@ document.body.appendChild( renderer.domElement );
 //Globe
 const globeRadius = 10;
 const geometry = new THREE.SphereGeometry(globeRadius, 100, 100);
-const material = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load('./images/UVmap.jpg') } );
+const material = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load('./images/UVmap.jpeg') } );
 const globe = new THREE.Mesh( geometry, material);
 
 //Mouse movement setup
