@@ -12,11 +12,12 @@ renderer.setPixelRatio(window.devicePixelRatio)
 document.body.appendChild( renderer.domElement );
 
 //Globe
-const geometry = new THREE.SphereGeometry( 10, 100, 100 );
+const globeRadius = 10;
+const geometry = new THREE.SphereGeometry(globeRadius, 100, 100);
 const material = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load('./images/UVmap.jpg') } );
-const globe = new THREE.Mesh( geometry, material );
+const globe = new THREE.Mesh( geometry, material);
 
-//Mouse movement
+//Mouse movement setup
 const group = new THREE.Group();
 group.add(globe);
 scene.add(group);
@@ -84,6 +85,12 @@ addEventListener('wheel', (event) => {
         }, 1);
     }
 }, { passive: false });
+
+addPing(-74.00597, 40.71427, 0x00ff00); // New York
+addPing(13.41053, 52.52437, 0x00ff00); //Berline
+addPing(114.16, 22.3, 0x00ff00); //Hong Kong
+addPing(-122.41, 37.77, 0x00ff00); //San Fran
+addPing(0, 0, 0x00ff00);
   
 //Animate
 camera.position.z = 15;
@@ -97,7 +104,7 @@ animate();
 //Functions
 function updateRotation() {
 	if (autoRotate) {
-	  globe.rotation.y += 0.001;
+	  globe.rotation.y += 0.000;
 	} 
 	else {
 	  group.rotation.x += (targetRotation.x - group.rotation.x) * rotationSpeed;
@@ -121,4 +128,27 @@ function checkIfClickedOnGlobe(event) {
 	else {
         cursorOnGlobe = false;
     }
+}
+
+function addPing(longitude, latitude, color) {
+    const [x, y, z] = lnglatToXYZ(longitude, latitude, globeRadius);
+
+    const markerGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+    const markerMaterial = new THREE.MeshBasicMaterial({ color: color });
+    const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+
+    marker.position.set(x, y, z);
+
+    globe.add(marker);
+}
+
+function lnglatToXYZ(longitude, latitude, radius) {
+    const radLat = (90 - latitude) * (Math.PI / 180);
+    const radLng = (longitude + 180) * (Math.PI / 180);
+
+    const x = -(radius * Math.sin(radLat) * Math.cos(radLng));
+    const z = radius * Math.sin(radLat) * Math.sin(radLng);
+    const y = radius * Math.cos(radLat);
+
+    return [x, y, z];
 }
