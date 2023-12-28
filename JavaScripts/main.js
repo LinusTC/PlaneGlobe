@@ -35,17 +35,17 @@ addEventListener('wheel', (event) => {handleWheel(event, targetRotation, rendere
 
 //Get Airport Data
 let dataArray = [];
+let airportNames = [];
 const url = 'https://raw.githubusercontent.com/mwgg/Airports/master/airports.json';
 
 fetchData(url)
   .then((data) => {
     dataArray = data;
-    console.log(dataArray[0]);
-
+    airportNames = dataArray.map(airport => airport.name);
     for (let i = 0; i < 5;i++){
         const lng = dataArray[i].lon;
         const lat = dataArray[i].lat;
-
+        console.log(airportNames[i]);
         addPing(lng, lat, 0x00ff00);
     }
   })
