@@ -2,19 +2,20 @@ import * as THREE from 'three';
 import {handleMouseDown, handleMouseUp, handleMouseMove, handleWheel } from './MouseControl.js';
 import {fetchData} from './GetAirportData.js'; 
 import {jumpToPing, lnglatToXYZ } from './JumpToPing.js';
-import { setupSearchBar } from './SearchBar.js';
+import {setUpEnd, setUpStart} from './SearchBar.js';
 
-//Get Airport Data
 let dataArray = [];
 let airportNames = [];
 const url = 'https://raw.githubusercontent.com/mwgg/Airports/master/airports.json';
-let selectedAirport = null;
+let selectedStart = null;
+let selectedEnd = null;
 
 fetchData(url)
   .then((data) => {
     dataArray = data;
     airportNames = dataArray.map(airport => airport.name);
-    setupSearchBar(airportNames, selectedAirport);
+    setUpStart(airportNames, selectedStart, 0x00ff00);
+    setUpEnd(airportNames, selectedEnd, 0xff0000);
   })
   .catch((error) => {
     console.error('Error:', error);
@@ -61,18 +62,12 @@ animate();
 
 //Functions
 
-export function addPingForSelectedAirport(selectedAirport) {
+export function addPingForSelectedAirport(selectedAirport,color) {
   const airport = dataArray.find((item) => item.name === selectedAirport);
+  const lon = airport.lon;
+  const lat = airport.lat;
 
-  if (airport) {
-      const lon = airport.lon;
-      const lat = airport.lat;
-      const color = 0x00ff00;
-
-      addPing(lon, lat, color);
-  } else {
-      console.error(`Airport '${selectedAirport}' not found in the data.`);
-  }
+  addPing(lon, lat, color);
 }
 
 export function updateRotation() {
