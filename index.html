@@ -3,10 +3,9 @@
 <head>
   <meta charset="utf-8">
   <title>PlaneGlobe</title>
-  <style>
-    body { margin: 0; }
-  </style>
-
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+  <link rel = "stylesheet" href = "style.css">
   <script type="importmap">
     {
       "imports": {
@@ -15,8 +14,18 @@
       }
     }
   </script>
-</head>
+</head> 
 <body>
-  <script type="module" src="./JavaScripts/main.js"></script>
+    <div class="search-box">
+      <div class="row"> 
+        <input type="text" id="input-box" placeholder="Search Airport" autocomplete="off">
+        <button type="search-button" class="btn btn-default btn-sm">
+          <span class="glyphicon glyphicon-search"></span> Search
+        </button>
+      </div>
+      <div class = "result-box">
+      </div>
+    </div>
+    <script type="module" src="./JavaScripts/main.js"></script>
 </body>
 </html>
