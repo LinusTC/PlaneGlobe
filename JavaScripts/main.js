@@ -38,6 +38,23 @@ const geometry = new THREE.SphereGeometry(globeRadius, 100, 100);
 const material = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load('./images/UVmap.jpeg') } );
 const globe = new THREE.Mesh( geometry, material);
 
+//Stars
+const starGeometry = new THREE.BufferGeometry()
+const starMaterial = new THREE.PointsMaterial({ color: 0xffffff});
+
+const starArray = []
+for (let i = 0;i < 10000; i++){
+  const x = (Math.random() - 0.5) * 2000;
+  const y = (Math.random() - 0.5) * 2000;
+  const z = -Math.random() * 2000;
+  starArray.push(x,y,z)
+}
+
+starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starArray, 3))
+const stars = new THREE.Points(starGeometry, starMaterial)
+scene.add(stars);
+scene.background = new THREE.Color(0x111130);
+
 //Mouse movement setup
 const group = new THREE.Group();
 group.add(globe);
@@ -56,8 +73,10 @@ camera.position.z = 15;
 function animate() {
 	requestAnimationFrame(animate);
   	updateRotation();
-  	renderer.render(scene, camera);
-}
+    stars.rotation.x += 0.0001;
+    stars.rotation.y += 0.0001;
+    renderer.render(scene, camera);
+  }
 animate();
 
 //Functions
@@ -97,11 +116,7 @@ export function removePing(longitude, latitude) {
   for (let i = 0; i < globe.children.length; i++) {
       const marker = globe.children[i];
       const markerPosition = marker.position;
-      if (
-        markerPosition.x === x &&
-        markerPosition.y === y &&
-        markerPosition.z === z
-      ) {
+      if (markerPosition.x === x && markerPosition.y === y && markerPosition.z === z) {
         globe.remove(marker);
       }
   }
