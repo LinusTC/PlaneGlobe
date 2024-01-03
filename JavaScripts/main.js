@@ -129,9 +129,9 @@ function drawTravelLine(startAirport, endAirport) {
     points.push(new THREE.Vector3(x, y, z));
   }
   //Line
-const lineMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: 20});
-const lineGeometry = new THREE.BufferGeometry();
-const line = new THREE.Line(lineGeometry, lineMaterial);
-globe.add(line);
+  const lineMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: 20});
+  const lineGeometry = new THREE.BufferGeometry();
+  const line = new THREE.Line(lineGeometry, lineMaterial);
+  globe.add(line);
   line.geometry.setFromPoints(points);
 }
