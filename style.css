@@ -10,32 +10,24 @@ body {
     overflow: hidden;
 }
 
-.search-box-start {
+.controls-container {
     position: absolute;
-    width: 370px;
-    background: #fff;
-    margin: 30px 20px;
-    border-radius: 10px;
 }
 
-.search-box-start button {
-    border: none; 
-    padding: 15px 20px; 
-    font-size: 14px; 
+.search-box-start {
+    position: absolute;
+    width: 360px;
+    background: #fff;
+    margin: 20px 20px;
+    border-radius: 10px;
 }
 
 .search-box-end {
     position: absolute;
-    width: 370px;
+    width: 360px;
     background: #fff;
-    margin: 130px 20px;
+    margin: 100px 20px;
     border-radius: 10px;
-}
-
-.search-box-end button {
-    border: none; 
-    padding: 15px 20px; 
-    font-size: 14px; 
 }
 
 .row {
@@ -57,7 +49,7 @@ input{
 .result-box-start,
 .result-box-end {
     position: absolute;
-    width: 370px;
+    width: 360px;
     background: #fff;
     border-radius: 10px;
     z-index: 2; 
@@ -83,4 +75,14 @@ input{
 .result-box-start ul li:hover,
 .result-box-end ul li:hover {
     background: #e9f3ff;
+}
+
+.map-button{
+    position: absolute;
+    margin: 75px 390px;
+}
+
+.erase-button{
+    position: absolute;
+    margin: 180px 20px;
 }

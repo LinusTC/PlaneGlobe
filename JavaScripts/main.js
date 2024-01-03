@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {handleMouseDown, handleMouseUp, handleMouseMove, handleWheel } from './MouseControl.js';
 import {fetchData} from './GetAirportData.js'; 
 import {jumpToPing, lnglatToXYZ } from './JumpToPing.js';
-import {setUpEnd, setUpStart} from './SearchBar.js';
+import {setUpEnd, setUpStart, selectedEndSearch, selectedStartSearch} from './SearchBar.js';
 
 let dataArray = [];
 let airportNames = [];
@@ -69,9 +69,11 @@ addEventListener('mousedown', (event) => {handleMouseDown(event, camera, globe);
 addEventListener('mouseup', handleMouseUp);
 addEventListener('mousemove', (event) => {handleMouseMove(event, targetRotation);});
 addEventListener('wheel', (event) => {handleWheel(event, targetRotation, renderer);}, { passive: false });
+document.querySelector('.map-button button').addEventListener('click', handleMapButtonClick);
+document.querySelector('.erase-button button').addEventListener('click', removeAllPings);
 
 //Animate
-camera.position.z = 15;
+camera.position.z = 16;
 function animate() {
 	requestAnimationFrame(animate);
   	updateRotation();
@@ -87,14 +89,24 @@ export function updateRotation() {
   group.rotation.y += (targetRotation.y - group.rotation.y) * rotationSpeed;
 }
 
+function handleMapButtonClick() {
+  if (selectedStartSearch && selectedEndSearch) {
+    addPingForSelectedAirport(selectedStartSearch, 0x00ff00);
+    addPingForSelectedAirport(selectedEndSearch, 0x0000ff);
+  } else {
+    console.log("Please select both start and end airports.");
+  }
+}
+
 export function addPingForSelectedAirport(selectedAirport,color) {
   const airport = dataArray.find((item) => item.name === selectedAirport);
   const lon = airport.lon;
   const lat = airport.lat;
 
-  addPing(lon, lat, color);
-  
-  return {lon, lat};
+  const exist = findPing(lon, lat)
+  if(exist == null){
+    addPing(lon, lat, color)
+  }
 }
 
 function addPing(longitude, latitude, color) {
@@ -118,8 +130,34 @@ export function removePing(longitude, latitude) {
   for (let i = 0; i < globe.children.length; i++) {
       const marker = globe.children[i];
       const markerPosition = marker.position;
+
       if (markerPosition.x === x && markerPosition.y === y && markerPosition.z === z) {
         globe.remove(marker);
       }
   }
+}
+
+function findPing(longitude, latitude) {
+  const [x, y, z] = lnglatToXYZ(longitude, latitude, globeRadius);
+
+  for (let i = 0; i < globe.children.length; i++) {
+    const marker = globe.children[i];
+    const markerPosition = marker.position;
+
+    if (markerPosition.x === x && markerPosition.y === y && markerPosition.z === z) {
+      return marker;
+    }
+  }
+  return null;
+}
+
+function removeAllPings() {
+  const allMarkers = [];
+  for (let i = 0; i < globe.children.length; i++) {
+    const marker = globe.children[i];
+    allMarkers.push(marker);
+  }
+  allMarkers.forEach(marker => {
+    globe.remove(marker);
+  });
 }
