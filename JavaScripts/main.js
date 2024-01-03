@@ -61,6 +61,10 @@ function animate() {
 animate();
 
 //Functions
+export function updateRotation() {
+  group.rotation.x += (targetRotation.x - group.rotation.x) * rotationSpeed;
+  group.rotation.y += (targetRotation.y - group.rotation.y) * rotationSpeed;
+}
 
 export function addPingForSelectedAirport(selectedAirport,color) {
   const airport = dataArray.find((item) => item.name === selectedAirport);
@@ -68,11 +72,8 @@ export function addPingForSelectedAirport(selectedAirport,color) {
   const lat = airport.lat;
 
   addPing(lon, lat, color);
-}
-
-export function updateRotation() {
-    group.rotation.x += (targetRotation.x - group.rotation.x) * rotationSpeed;
-    group.rotation.y += (targetRotation.y - group.rotation.y) * rotationSpeed;
+  
+  return {lon, lat};
 }
 
 function addPing(longitude, latitude, color) {
@@ -88,4 +89,20 @@ function addPing(longitude, latitude, color) {
 
     //Jump to marker
     jumpToPing(longitude, latitude, globeRadius, group, targetRotation);
+}
+
+export function removePing(longitude, latitude) {
+  const [x, y, z] = lnglatToXYZ(longitude, latitude, globeRadius);
+
+  for (let i = 0; i < globe.children.length; i++) {
+      const marker = globe.children[i];
+      const markerPosition = marker.position;
+      if (
+        markerPosition.x === x &&
+        markerPosition.y === y &&
+        markerPosition.z === z
+      ) {
+        globe.remove(marker);
+      }
+  }
 }

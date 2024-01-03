@@ -1,4 +1,7 @@
-import { addPingForSelectedAirport } from "./main.js";
+import { addPingForSelectedAirport, removePing } from "./main.js";
+
+let startLastLngLat = {lon: null, lat: null};
+let endLastLngLat = {lon: null, lat: null};
 
 export function setUpStart(airportNames, selectedAirport, pingColor) {
   const resultsBox = document.querySelector(".result-box-start");
@@ -30,7 +33,11 @@ export function setUpStart(airportNames, selectedAirport, pingColor) {
       inputBox.value = list.innerHTML;
       selectedAirport = list.innerHTML;
       resultsBox.innerHTML = '';
-      addPingForSelectedAirport(selectedAirport, pingColor);
+      
+      if(startLastLngLat.lon != null && startLastLngLat.lat != null){
+        removePing(startLastLngLat.lon, startLastLngLat.lat);
+      }
+      startLastLngLat = addPingForSelectedAirport(selectedAirport, pingColor);
   };
 }
 
@@ -64,7 +71,11 @@ export function setUpEnd(airportNames, selectedAirport, pingColor) {
     inputBox.value = list.innerHTML;
     selectedAirport = list.innerHTML;
     resultsBox.innerHTML = '';
-    addPingForSelectedAirport(selectedAirport, pingColor);
+
+    if(endLastLngLat.lon != null && endLastLngLat.lat != null){
+      removePing(endLastLngLat.lon, endLastLngLat.lat);
+    }
+    endLastLngLat = addPingForSelectedAirport(selectedAirport, pingColor);
   };
 }
   
