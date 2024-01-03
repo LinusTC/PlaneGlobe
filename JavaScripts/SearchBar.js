@@ -1,7 +1,7 @@
 export let selectedStartSearch = null;
 export let selectedEndSearch = null;
 
-export function setUpStart(airportNames, selectedAirport, pingColor) {
+export function setUpStart(airportNames, selectedAirport) {
   const resultsBox = document.querySelector(".result-box-start");
   const inputBox = document.getElementById("input-box-start");
 
@@ -36,7 +36,7 @@ export function setUpStart(airportNames, selectedAirport, pingColor) {
   };
 }
 
-export function setUpEnd(airportNames, selectedAirport, pingColor) {
+export function setUpEnd(airportNames, selectedAirport) {
   const resultsBox = document.querySelector(".result-box-end");
   const inputBox = document.getElementById("input-box-end");
 

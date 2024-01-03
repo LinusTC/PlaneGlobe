@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import {handleMouseDown, handleMouseUp, handleMouseMove, handleWheel } from './MouseControl.js';
 import {fetchData} from './GetAirportData.js'; 
-import {jumpToPing, lnglatToXYZ } from './JumpToPing.js';
+import {jumpToPing, lnglatToXYZ, addPing, removeAllPings, findPing, getAirportCoordinates} from './PingFunctions.js';
 import {setUpEnd, setUpStart, selectedEndSearch, selectedStartSearch} from './SearchBar.js';
 
-let dataArray = [];
+export let dataArray = [];
 let airportNames = [];
 const url = 'https://raw.githubusercontent.com/mwgg/Airports/master/airports.json';
 let selectedStart = null;
@@ -14,8 +14,8 @@ fetchData(url)
   .then((data) => {
     dataArray = data;
     airportNames = dataArray.map(airport => airport.name);
-    setUpStart(airportNames, selectedStart, 0x00ff00);
-    setUpEnd(airportNames, selectedEnd, 0xff0000);
+    setUpStart(airportNames, selectedStart);
+    setUpEnd(airportNames, selectedEnd);
   })
   .catch((error) => {
     console.error('Error:', error);
@@ -23,20 +23,20 @@ fetchData(url)
 
 //Camera
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+export const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
 //Renderer
-const renderer = new THREE.WebGLRenderer(
+export const renderer = new THREE.WebGLRenderer(
 	{antialias: true});
 renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.setPixelRatio(window.devicePixelRatio)
 document.body.appendChild( renderer.domElement );
 
 //Globe
-const globeRadius = 10;
+export const globeRadius = 10;
 const geometry = new THREE.SphereGeometry(globeRadius, 100, 100);
 const material = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load('./images/UVmap.jpeg') } );
-const globe = new THREE.Mesh( geometry, material);
+export const globe = new THREE.Mesh( geometry, material);
 
 //Stars
 const starGeometry = new THREE.BufferGeometry()
@@ -58,17 +58,17 @@ scene.add(stars);
 scene.background = new THREE.Color(0x111125);
 
 //Mouse movement setup
-const group = new THREE.Group();
+export const group = new THREE.Group();
 group.add(globe);
 scene.add(group);
 const rotationSpeed = 0.08;
-let targetRotation = { x: 0, y: 0 };
+export let targetRotation = { x: 0, y: 0 };
 
 //Mouse Tracker
-addEventListener('mousedown', (event) => {handleMouseDown(event, camera, globe);});
+addEventListener('mousedown', (event) => {handleMouseDown(event, camera);});
 addEventListener('mouseup', handleMouseUp);
 addEventListener('mousemove', (event) => {handleMouseMove(event, targetRotation);});
-addEventListener('wheel', (event) => {handleWheel(event, targetRotation, renderer);}, { passive: false });
+addEventListener('wheel', (event) => {handleWheel(event);}, { passive: false });
 document.querySelector('.map-button button').addEventListener('click', handleMapButtonClick);
 document.querySelector('.erase-button button').addEventListener('click', removeAllPings);
 
@@ -93,6 +93,7 @@ function handleMapButtonClick() {
   if (selectedStartSearch && selectedEndSearch) {
     addPingForSelectedAirport(selectedStartSearch, 0x00ff00);
     addPingForSelectedAirport(selectedEndSearch, 0x0000ff);
+    drawTravelLine(selectedStartSearch, selectedEndSearch);
   } else {
     console.log("Please select both start and end airports.");
   }
@@ -109,55 +110,28 @@ export function addPingForSelectedAirport(selectedAirport,color) {
   }
 }
 
-function addPing(longitude, latitude, color) {
-    //Get X,Y,Z Coordinate on globe
-    const [x, y, z] = lnglatToXYZ(longitude, latitude, globeRadius);
+function drawTravelLine(startAirport, endAirport) {
+  const startCoords = getAirportCoordinates(startAirport);
+  const endCoords = getAirportCoordinates(endAirport);
 
-    //Create a marker
-    const markerGeometry = new THREE.SphereGeometry(0.1, 32, 32);
-    const markerMaterial = new THREE.MeshBasicMaterial({ color: color });
-    const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-    marker.position.set(x, y, z);
-    globe.add(marker);
+  const points = [];
+  const numPoints = 100;
 
-    //Jump to marker
-    jumpToPing(longitude, latitude, globeRadius, group, targetRotation);
-}
+  for (let i = 0; i <= numPoints; i++) {
+    const t = i / numPoints;
+    const lon = startCoords.lon + t * (endCoords.lon - startCoords.lon);
+    const lat = startCoords.lat + t * (endCoords.lat - startCoords.lat);
 
-export function removePing(longitude, latitude) {
-  const [x, y, z] = lnglatToXYZ(longitude, latitude, globeRadius);
+    const radius = globeRadius + Math.sin(t * Math.PI) * 0.5;
+    const clampedRadius = Math.min(radius, globeRadius + 1);
 
-  for (let i = 0; i < globe.children.length; i++) {
-      const marker = globe.children[i];
-      const markerPosition = marker.position;
-
-      if (markerPosition.x === x && markerPosition.y === y && markerPosition.z === z) {
-        globe.remove(marker);
-      }
+    const [x, y, z] = lnglatToXYZ(lon, lat, clampedRadius);
+    points.push(new THREE.Vector3(x, y, z));
   }
-}
-
-function findPing(longitude, latitude) {
-  const [x, y, z] = lnglatToXYZ(longitude, latitude, globeRadius);
-
-  for (let i = 0; i < globe.children.length; i++) {
-    const marker = globe.children[i];
-    const markerPosition = marker.position;
-
-    if (markerPosition.x === x && markerPosition.y === y && markerPosition.z === z) {
-      return marker;
-    }
-  }
-  return null;
-}
-
-function removeAllPings() {
-  const allMarkers = [];
-  for (let i = 0; i < globe.children.length; i++) {
-    const marker = globe.children[i];
-    allMarkers.push(marker);
-  }
-  allMarkers.forEach(marker => {
-    globe.remove(marker);
-  });
+  //Line
+const lineMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: 20});
+const lineGeometry = new THREE.BufferGeometry();
+const line = new THREE.Line(lineGeometry, lineMaterial);
+globe.add(line);
+  line.geometry.setFromPoints(points);
 }

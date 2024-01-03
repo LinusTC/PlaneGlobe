@@ -1,10 +1,11 @@
 import * as THREE from 'three';
+import {globe, camera, targetRotation, renderer} from './main.js';
 
 let isLeftButtonDown = false;
 let previousMousePosition = { x: 0, y: 0 };
 let cursorOnGlobe = false;
 
-function checkIfClickedOnGlobe(event, camera, globe) {
+function checkIfClickedOnGlobe(event, camera) {
     const mouse = new THREE.Vector2();
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -21,7 +22,7 @@ function checkIfClickedOnGlobe(event, camera, globe) {
     }
 }
 
-export function handleMouseDown(event, camera, globe) {
+export function handleMouseDown(event) {
     if (event.button === 0) {
         isLeftButtonDown = true;
         previousMousePosition = {
@@ -39,7 +40,7 @@ export function handleMouseUp(event) {
     }
 }
 
-export function handleMouseMove(event, targetRotation) {
+export function handleMouseMove(event) {
     if (isLeftButtonDown && cursorOnGlobe) {
         const currentMousePosition = {
             x: event.clientX / window.innerWidth * 2 - 1,
@@ -53,7 +54,7 @@ export function handleMouseMove(event, targetRotation) {
     }
 }
 
-export function handleWheel(event, targetRotation, renderer) {
+export function handleWheel(event) {
     if (cursorOnGlobe) {
         const scrollSpeed = 0.003;
 
