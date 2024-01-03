@@ -1,4 +1,4 @@
-import { addPingForSelectedAirport, removePing } from "./main.js";
+import {addPingForSelectedAirport, removePing} from "./main.js";
 
 let startLastLngLat = {lon: null, lat: null};
 let endLastLngLat = {lon: null, lat: null};

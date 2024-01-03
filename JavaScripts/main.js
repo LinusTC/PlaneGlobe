@@ -53,7 +53,9 @@ for (let i = 0;i < 10000; i++){
 starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starArray, 3))
 const stars = new THREE.Points(starGeometry, starMaterial)
 scene.add(stars);
-scene.background = new THREE.Color(0x111130);
+
+//Background
+scene.background = new THREE.Color(0x111125);
 
 //Mouse movement setup
 const group = new THREE.Group();
