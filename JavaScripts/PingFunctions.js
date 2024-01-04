@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {updateRotation, globe, globeRadius, group, targetRotation, dataArray} from './main.js';
 
-export function jumpToPing(longitude, latitude, globeRadius, group, targetRotation){
+export function jumpToPing(longitude, latitude){
     const [x, y, z] = lnglatToXYZ(longitude, latitude, globeRadius);
 
     const target = new THREE.Vector3(x, y, z);
@@ -45,7 +45,7 @@ export function addPing(longitude, latitude, color) {
     globe.add(marker);
 
     //Jump to marker
-    jumpToPing(longitude, latitude, globeRadius, group, targetRotation);
+    jumpToPing(longitude, latitude);
 }
 
 export function removePing(longitude, latitude) {

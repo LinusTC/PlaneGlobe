@@ -3,6 +3,7 @@ import {handleMouseDown, handleMouseUp, handleMouseMove, handleWheel } from './M
 import {fetchData} from './GetAirportData.js'; 
 import {jumpToPing, lnglatToXYZ, addPing, removeAllPings, findPing, getAirportCoordinates} from './PingFunctions.js';
 import {setUpEnd, setUpStart, selectedEndSearch, selectedStartSearch} from './SearchBar.js';
+import {getLinePoints, objectFollowLine} from './LinePlane.js';
 
 export let dataArray = [];
 let airportNames = [];
@@ -43,10 +44,10 @@ const starGeometry = new THREE.BufferGeometry()
 const starMaterial = new THREE.PointsMaterial({ color: 0xffffff});
 
 const starArray = []
-for (let i = 0;i < 10000; i++){
+for (let i = 0;i < 20000; i++){
   const x = (Math.random() - 0.5) * 2000;
   const y = (Math.random() - 0.5) * 2000;
-  const z = -Math.random() * 2000;
+  const z = (Math.random() - 0.5) * 2000;
   starArray.push(x,y,z)
 }
 
@@ -62,7 +63,7 @@ export const group = new THREE.Group();
 group.add(globe);
 scene.add(group);
 const rotationSpeed = 0.08;
-export let targetRotation = { x: 0, y: 0 };
+export let targetRotation = {x: 0, y: 0};
 
 //Mouse Tracker
 addEventListener('mousedown', (event) => {handleMouseDown(event, camera);});
@@ -73,29 +74,34 @@ document.querySelector('.map-button button').addEventListener('click', handleMap
 document.querySelector('.erase-button button').addEventListener('click', removeAllPings);
 
 //Animate
-camera.position.z = 16;
+camera.position.z = 15.5;
 function animate() {
 	requestAnimationFrame(animate);
   	updateRotation();
-    stars.rotation.x += 0.0001;
-    stars.rotation.y += 0.0001;
+    stars.rotation.x += 0.0005;
+    stars.rotation.y += 0.0005;
     renderer.render(scene, camera);
   }
 animate();
 
 //Functions
 export function updateRotation() {
-  group.rotation.x += (targetRotation.x - group.rotation.x) * rotationSpeed;
-  group.rotation.y += (targetRotation.y - group.rotation.y) * rotationSpeed;
+  globe.rotation.x += (targetRotation.x - globe.rotation.x) * rotationSpeed;
+  globe.rotation.y += (targetRotation.y - globe.rotation.y) * rotationSpeed;
 }
 
 function handleMapButtonClick() {
   if (selectedStartSearch && selectedEndSearch) {
     addPingForSelectedAirport(selectedStartSearch, 0x00ff00);
     addPingForSelectedAirport(selectedEndSearch, 0x0000ff);
-    drawTravelLine(selectedStartSearch, selectedEndSearch);
-  } else {
-    console.log("Please select both start and end airports.");
+    const line = getLinePoints(selectedStartSearch, selectedEndSearch).line;
+    const points = getLinePoints(selectedStartSearch, selectedEndSearch).points;
+    globe.add(line);
+    objectFollowLine(points);
+  } 
+  
+  else {
+    alert("Please select both start and end airports.");
   }
 }
 
@@ -108,30 +114,4 @@ export function addPingForSelectedAirport(selectedAirport,color) {
   if(exist == null){
     addPing(lon, lat, color)
   }
-}
-
-function drawTravelLine(startAirport, endAirport) {
-  const startCoords = getAirportCoordinates(startAirport);
-  const endCoords = getAirportCoordinates(endAirport);
-
-  const points = [];
-  const numPoints = 100;
-
-  for (let i = 0; i <= numPoints; i++) {
-    const t = i / numPoints;
-    const lon = startCoords.lon + t * (endCoords.lon - startCoords.lon);
-    const lat = startCoords.lat + t * (endCoords.lat - startCoords.lat);
-
-    const radius = globeRadius + Math.sin(t * Math.PI) * 0.5;
-    const clampedRadius = Math.min(radius, globeRadius + 1);
-
-    const [x, y, z] = lnglatToXYZ(lon, lat, clampedRadius);
-    points.push(new THREE.Vector3(x, y, z));
-  }
-  //Line
-  const lineMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: 20});
-  const lineGeometry = new THREE.BufferGeometry();
-  const line = new THREE.Line(lineGeometry, lineMaterial);
-  globe.add(line);
-  line.geometry.setFromPoints(points);
 }
