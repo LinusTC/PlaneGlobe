@@ -78,8 +78,8 @@ camera.position.z = 15.5;
 function animate() {
 	requestAnimationFrame(animate);
   	updateRotation();
-    stars.rotation.x += 0.0005;
-    stars.rotation.y += 0.0005;
+    stars.rotation.x += 0.0003;
+    stars.rotation.y += 0.0003;
     renderer.render(scene, camera);
   }
 animate();
@@ -94,24 +94,24 @@ function handleMapButtonClick() {
   if (selectedStartSearch && selectedEndSearch) {
     addPingForSelectedAirport(selectedStartSearch, 0x00ff00);
     addPingForSelectedAirport(selectedEndSearch, 0x0000ff);
-    const line = getLinePoints(selectedStartSearch, selectedEndSearch).line;
-    const points = getLinePoints(selectedStartSearch, selectedEndSearch).points;
+    const lineData = getLinePoints(selectedStartSearch, selectedEndSearch);
+    const line = lineData.line;
+    const points = lineData.points;
     globe.add(line);
     objectFollowLine(points);
-  } 
-  
-  else {
-    alert("Please select both start and end airports.");
+  }
+  else{
+    console.log('empty')
   }
 }
 
 export function addPingForSelectedAirport(selectedAirport,color) {
   const airport = dataArray.find((item) => item.name === selectedAirport);
-  const lon = airport.lon;
+  const lng = airport.lon;
   const lat = airport.lat;
 
-  const exist = findPing(lon, lat)
+  const exist = findPing(lng, lat)
   if(exist == null){
-    addPing(lon, lat, color)
+    addPing(lng, lat, color)
   }
 }

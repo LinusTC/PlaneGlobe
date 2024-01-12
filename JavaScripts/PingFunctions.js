@@ -88,6 +88,6 @@ export function removeAllPings() {
 
 export function getAirportCoordinates(airportName) {
     const airport = dataArray.find((item) => item.name === airportName);
-    return { lon: airport.lon, lat: airport.lat };
+    return { lng: airport.lon, lat: airport.lat };
   }
   

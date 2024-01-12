@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {globe, camera, targetRotation, renderer} from './main.js';
 
 let isLeftButtonDown = false;
-let previousMousePosition = { x: 0, y: 0 };
+let prevMouse = { x: 0, y: 0 };
 let cursorOnGlobe = false;
 
 function checkIfClickedOnGlobe(event, camera) {
@@ -25,7 +25,7 @@ function checkIfClickedOnGlobe(event, camera) {
 export function handleMouseDown(event) {
     if (event.button === 0) {
         isLeftButtonDown = true;
-        previousMousePosition = {
+        prevMouse = {
             x: event.clientX / window.innerWidth * 2 - 1,
             y: event.clientY / window.innerHeight * 2 + 1
         };
@@ -42,15 +42,15 @@ export function handleMouseUp(event) {
 
 export function handleMouseMove(event) {
     if (isLeftButtonDown && cursorOnGlobe) {
-        const currentMousePosition = {
+        const currMouse = {
             x: event.clientX / window.innerWidth * 2 - 1,
             y: (event.clientY / window.innerHeight) * 2 + 1
         };
 
-        targetRotation.y += currentMousePosition.x - previousMousePosition.x;
-        targetRotation.x += currentMousePosition.y - previousMousePosition.y;
+        targetRotation.y += currMouse.x - prevMouse.x;
+        targetRotation.x += currMouse.y - prevMouse.y;
 
-        previousMousePosition = currentMousePosition;
+        prevMouse = currMouse;
     }
 }
 
@@ -58,10 +58,10 @@ export function handleWheel(event) {
     if (cursorOnGlobe) {
         const scrollSpeed = 0.003;
 
-        const verticalChange = event.deltaY;
-        targetRotation.x += -verticalChange * scrollSpeed;
-        const horizontalChange = event.deltaX;
-        targetRotation.y += -horizontalChange * scrollSpeed;
+        const yDelta = event.deltaY;
+        targetRotation.x += -yDelta * scrollSpeed;
+        const xDelta = event.deltaX;
+        targetRotation.y += -xDelta * scrollSpeed;
 
         if (event.target === renderer.domElement) {
             event.preventDefault();
