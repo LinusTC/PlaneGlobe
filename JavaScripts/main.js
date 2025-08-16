@@ -23,8 +23,7 @@ scene.background = setUpBackground
 //Globe
 scene.add(sphere)
 scene.add(line)
-const countries = await drawLines();
-scene.add(countries);
+scene.add(await drawLines());
 
 //Orbit Controls
 const controls = new OrbitControls(camera, renderer.domElement);
