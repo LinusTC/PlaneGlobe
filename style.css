@@ -1,0 +1,89 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+.controls-container {
+    position: absolute;
+}
+
+.search-box-start {
+    position: static;
+    width: 360px;
+    background: #fff;
+    margin: 20px 20px;
+    border-radius: 10px;
+}
+.search-box-end {
+    position: static;
+    width: 360px;
+    background: #fff;
+    margin: 20px 20px;
+    border-radius: 10px;
+}
+.row {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+input{
+    flex:1;
+    height: 50px;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.result-box-start,
+.result-box-end {
+    position: static;
+    width: 360px;
+    background: #fff;
+    border-radius: 10px;
+    z-index: 2; 
+    top: 5 px;
+    max-height: 400px;
+    overflow-y: scroll;
+}
+
+.result-box-start ul,
+.result-box-end ul {
+    border-top: 1px;
+    padding: 15px 10px;
+}
+
+.result-box-start ul li,
+.result-box-end ul li {
+    list-style: none;
+    border-radius: 3px;
+    padding: 15px 10px;
+    cursor: pointer;
+}
+
+.result-box-start ul li:hover,
+.result-box-end ul li:hover {
+    background: #e9f3ff;
+}
+
+.buttons-row {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.map-button{
+    margin-left: 20px;
+}
+.erase-button{
+    margin-right: 20px;
+}

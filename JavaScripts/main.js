@@ -1,7 +1,18 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { getData } from './getAirportData.js';
+import { setUpAutocomplete } from './searchBar.js';
 import { setUpCamera, setUpRenderer, setUpStars, setUpBackground } from './setup.js';
 import { sphere, line, drawLines } from './globe.js';
+
+//Seach Containers
+let startAirport;
+let endAirport;
+(async () => {
+  const { airportData, airportNames } = await getData();
+  setUpAutocomplete(airportNames, 'input-box-start', '.result-box-start', (value) => {startAirport = value;});
+  setUpAutocomplete(airportNames, 'input-box-end', '.result-box-end', (value) => {endAirport = value;});
+})();
 
 //Scene
 const scene = new THREE.Scene();

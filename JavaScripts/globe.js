@@ -15,7 +15,7 @@ const material = new THREE.MeshBasicMaterial( { color: 0x080c10 } );
 export const sphere = new THREE.Mesh( geometry, material );
 
 export async function drawLines() {
-  const response = await fetch('./geojson/countries.json');
+  const response = await fetch('./data/countries.json');
   const data = await response.json();
   const countries = drawThreeGeo({
     json: data,

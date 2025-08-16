@@ -16,6 +16,37 @@
   </script>
 </head> 
 <body>
+  <div class="controls-container">
+    <div class="search-box-start">
+      <div class="row"> 
+        <input type="text" id="input-box-start" placeholder="Search Start" autocomplete="off">
+      </div>
+      <div class = "result-box-start">
+      </div>
+    </div>
+
+    <div class="search-box-end">
+      <div class="row"> 
+        <input type="text" id="input-box-end" placeholder="Search End" autocomplete="off">
+      </div>
+      <div class = "result-box-end">
+      </div>
+    </div>
+
+    <div class="buttons-row">
+      <div class="map-button">
+        <button type="search-button" class="btn btn-default btn-lg">
+          <span class="glyphicon glyphicon-search"></span> Map
+        </button>
+      </div>
+
+      <div class="erase-button">
+        <button type="eraser-button" class="btn btn-default btn-lg">
+          <span class="glyphicon glyphicon-erase"></span> Erase All
+        </button>
+      </div>
+    </div>
+
     <script type="module" src="./JavaScripts/main.js"></script>
 </body>
 </html>
