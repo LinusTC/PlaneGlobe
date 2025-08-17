@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { drawThreeGeo } from "./threeGeoJSON.js";
+import { globeRadius } from './main.js';
 
-const geometry = new THREE.SphereGeometry(2);
+const geometry = new THREE.SphereGeometry(globeRadius);
 const lineMat = new THREE.LineBasicMaterial({ 
   color: 0xffffff,
   transparent: true,
@@ -19,7 +20,7 @@ export async function drawLines() {
   const data = await response.json();
   const countries = drawThreeGeo({
     json: data,
-    radius: 2,
+    radius: globeRadius,
   });
   return countries;
 }

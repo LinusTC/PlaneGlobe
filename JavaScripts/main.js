@@ -16,6 +16,7 @@ let endAirport;
 
 //Scene
 const scene = new THREE.Scene();
+export const globeRadius = 2;
 
 //Camera
 const camera = setUpCamera;
