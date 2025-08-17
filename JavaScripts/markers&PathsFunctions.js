@@ -71,14 +71,6 @@ export function getLinePoints(depAirport, arrAirport) {
     return [line, points, path];
 }
 
-export function createTraveller (){
-    const travelerGeom = new THREE.SphereGeometry(0.05, 16, 16);
-    const travelerMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const traveler = new THREE.Mesh(travelerGeom, travelerMat);
-
-    return traveler;
-}
-
 // Convert lon/lat to unit vector
 function lonLatToUnitVector(lon, lat) {
     const lonRad = THREE.MathUtils.degToRad(lon);

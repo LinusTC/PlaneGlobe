@@ -4,8 +4,9 @@ import { getData } from './getAirportData.js';
 import { clickMap, setUpAutocomplete } from './searchContainer.js';
 import { setUpCamera, setUpRenderer, setUpStars, setUpBackground } from './setup.js';
 import { sphere, line, drawLines } from './globe.js';
-import { createTraveller, getLinePoints } from './markers&PathsFunctions.js';
+import { getLinePoints } from './markers&PathsFunctions.js';
 import { cameraPositionZ, flightSpeed } from './constants.js';
+import { createTraveller } from './planeObject.js';
 
 //A global singleton store
 export const globalStore = {
