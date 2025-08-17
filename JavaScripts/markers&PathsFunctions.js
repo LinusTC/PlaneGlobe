@@ -48,18 +48,13 @@ export function getLinePoints(depAirport, arrAirport) {
     for (let i = 0; i <= numPoints; i++) {
         const t = i / numPoints;
         const interpolatedVec = slerp(startVec, endVec, t);
-        const radius = globeRadius + Math.sin(t * Math.PI) * 0.5;
+        const radius = globeRadius + Math.sin(t * Math.PI) * 0.35;
         const [x, y, z] = interpolatedVec.map(v => v * radius);
         points.push(new THREE.Vector3(x, y, z));
     }
 
-    // Create the curve
     const path = new THREE.CatmullRomCurve3(points);
-
-    // Create the tube geometry
     const geometry = new THREE.TubeGeometry(path, 64, 0.01, 8, false);
-
-    // Create gradient colors along the tube
     const colors = [];
     const colorStart = new THREE.Color(0xFF8B00);
     const colorEnd = new THREE.Color(0x0200C6);

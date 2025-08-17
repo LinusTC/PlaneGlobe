@@ -86,6 +86,7 @@ document.querySelector('.map-button button').addEventListener('click',
 document.querySelector('.erase-button button').addEventListener('click', 
   function () {
     globalStore.plottedAirports.clear();
+    globalStore.plottedLines.clear()
     while (containerLM.children.length > 0) {
       const child = containerLM.children[0];
       containerLM.remove(child);
