@@ -4,18 +4,21 @@ import { getData } from './getAirportData.js';
 import { clickMap, setUpAutocomplete } from './searchContainer.js';
 import { setUpCamera, setUpRenderer, setUpStars, setUpBackground } from './setup.js';
 import { sphere, line, drawLines } from './globe.js';
+import { getLinePoints } from './markers&PathsFunctions.js';
+import { cameraPositionZ } from './constants.js';
 
 //A global singleton store
 export const globalStore = {
   airportData: null,
   airportNames: null,
-  startAirport: null,
-  endAirport: null,
+  depAirport: null,
+  arrAirport: null,
   ready: getData().then(({ airportData, airportNames }) => {
     globalStore.airportData = airportData;
     globalStore.airportNames = airportNames;
   }),
   plottedAirports: new Set(),
+  plottedLines: new Set(),
 };
 
 //Scene
@@ -41,33 +44,40 @@ scene.add(globeContainer);
 
 //Camera and Orbit Controls
 const camera = setUpCamera;
-camera.position.z = 7.5;
+camera.position.z = cameraPositionZ;
 
 const cameraController = new CameraController(setUpCamera);
 const controls = createOrbitControls(camera, renderer);
 
 //Seach Containers
 globalStore.ready.then(function () {
-  setUpAutocomplete(globalStore.airportNames, 'input-box-start', '.result-box-start', (value) => {globalStore.startAirport = value;});
-  setUpAutocomplete(globalStore.airportNames, 'input-box-end', '.result-box-end', (value) => {globalStore.endAirport = value;});
+  setUpAutocomplete(globalStore.airportNames, 'input-box-start', '.result-box-start', (value) => {globalStore.depAirport = value;});
+  setUpAutocomplete(globalStore.airportNames, 'input-box-end', '.result-box-end', (value) => {globalStore.arrAirport = value;});
 });
 
 //Map and Erase Buttons
-const markerContainers = new THREE.Object3D();
-scene.add(markerContainers)
+const containerLM = new THREE.Object3D();
+scene.add(containerLM)
 document.querySelector('.map-button button').addEventListener('click', 
   function () {
     globalStore.ready.then(function () {
-      const [depMarker, arrMarker] = clickMap(globalStore.startAirport, globalStore.endAirport, cameraController)
-      if(!globalStore.plottedAirports.has(globalStore.startAirport)){
-        depMarker.name = globalStore.startAirport;
-        globalStore.plottedAirports.add(globalStore.startAirport);
-        markerContainers.add(depMarker);
+      const [depMarker, arrMarker] = clickMap(globalStore.depAirport, globalStore.arrAirport, cameraController)
+
+      if(!globalStore.plottedAirports.has(globalStore.depAirport)){
+        globalStore.plottedAirports.add(globalStore.depAirport);
+        containerLM.add(depMarker);
       }
-      if(!globalStore.plottedAirports.has(globalStore.endAirport)){
-        arrMarker.name = globalStore.endAirport;
-        globalStore.plottedAirports.add(globalStore.endAirport);
-        markerContainers.add(arrMarker);
+
+      if(!globalStore.plottedAirports.has(globalStore.arrAirport)){
+        globalStore.plottedAirports.add(globalStore.arrAirport);
+        containerLM.add(arrMarker);
+      }
+
+      const [line, points] = getLinePoints(globalStore.depAirport, globalStore.arrAirport);
+      const lineKey = getLineKey(globalStore.depAirport, globalStore.arrAirport);
+      if (!globalStore.plottedLines.has(lineKey)) {
+          globalStore.plottedLines.add(lineKey); // store the key
+          containerLM.add(line);
       }
     })
   }
@@ -76,9 +86,9 @@ document.querySelector('.map-button button').addEventListener('click',
 document.querySelector('.erase-button button').addEventListener('click', 
   function () {
     globalStore.plottedAirports.clear();
-    while (markerContainers.children.length > 0) {
-      const child = markerContainers.children[0];
-      markerContainers.remove(child);
+    while (containerLM.children.length > 0) {
+      const child = containerLM.children[0];
+      containerLM.remove(child);
     }
   }
 );
@@ -93,3 +103,8 @@ function animate() {
     controls.update();
   }
 animate();
+
+//Line name between two airports
+function getLineKey(dep, arr) {
+  return [dep, arr].sort().join(' to ');
+}

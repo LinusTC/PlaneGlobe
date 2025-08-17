@@ -1,6 +1,7 @@
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import * as THREE from 'three';
 import { getXYZCoordinate } from './markers&PathsFunctions.js';
+import { cameraPositionZ } from './constants.js';
 
 export class CameraController {
   constructor(camera) {
@@ -10,7 +11,7 @@ export class CameraController {
     this.isMoving = false;
   }
 
-  moveToAirport(depLon, depLat, distance = 5) {
+  moveToAirport(depLon, depLat, distance = cameraPositionZ) {
     const [x, y, z] = getXYZCoordinate(depLon, depLat);
     const dir = new THREE.Vector3(x, y, z).normalize();
 
