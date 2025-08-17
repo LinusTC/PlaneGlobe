@@ -1,3 +1,8 @@
+import { globalStore } from "./main.js";
+import { createMarker, getXYZCoordinate } from "./points&paths.js";
+import * as THREE from 'three';
+import { CameraController } from "./cameraControls.js";
+
 export function setUpAutocomplete(airportNames, inputId, resultsBoxSelector, onSelect) {
   const resultsBox = document.querySelector(resultsBoxSelector);
   const inputBox = document.getElementById(inputId);
@@ -26,5 +31,24 @@ export function setUpAutocomplete(airportNames, inputId, resultsBoxSelector, onS
         if (onSelect) onSelect(li.textContent);
       });
     });
+  }
+}
+
+export function clickMap(depAirport, arrAirport, CameraController){
+  if (depAirport == null || arrAirport == null)return;
+
+  else{
+    const depAirportCoords = globalStore.airportData.get(depAirport);
+    const [depLon, depLat] = depAirportCoords;
+
+    const arrAirportCoords = globalStore.airportData.get(arrAirport);
+    const [arrLon, arrLat] = arrAirportCoords;
+
+    const dep = createMarker(depLon, depLat);
+    const arr = createMarker(arrLon, arrLat);
+
+    CameraController.moveToAirport(depLon, depLat);
+
+    return [dep, arr]
   }
 }

@@ -18,7 +18,6 @@ export function drawThreeGeo({ json, radius, materalOptions }) {
     }
   }
 
-  container.rotation.x = -Math.PI * 0.5; // KLUDGY HACK to fix orientation
   const x_values = [];
   const y_values = [];
   const z_values = [];
@@ -182,12 +181,16 @@ export function drawThreeGeo({ json, radius, materalOptions }) {
   }
 
   function convertToSphereCoords(coordinates_array, sphere_radius) {
-    const lon = coordinates_array[0];
-    const lat = coordinates_array[1];
+      const lon = THREE.MathUtils.degToRad(coordinates_array[0]);
+      const lat = THREE.MathUtils.degToRad(coordinates_array[1]);
 
-    x_values.push(Math.cos(lat * Math.PI / 180) * Math.cos(lon * Math.PI / 180) * sphere_radius);
-    y_values.push(Math.cos(lat * Math.PI / 180) * Math.sin(lon * Math.PI / 180) * sphere_radius);
-    z_values.push(Math.sin(lat * Math.PI / 180) * sphere_radius);
+      const x = sphere_radius * Math.cos(lat) * Math.sin(lon);
+      const y = sphere_radius * Math.sin(lat);
+      const z = sphere_radius * Math.cos(lat) * Math.cos(lon);
+
+      x_values.push(x);
+      y_values.push(y);
+      z_values.push(z);
   }
 
   function drawParticle(x, y, z, options) {
@@ -199,7 +202,7 @@ export function drawThreeGeo({ json, radius, materalOptions }) {
 
     const particle_material = new THREE.PointsMaterial(options);
 
-    const particle = new THREE.Points(particle_geom, particle_material);
+    const particle = new THREE.Points(geo, particle_material);
     container.add(particle);
 
     clearArrays();

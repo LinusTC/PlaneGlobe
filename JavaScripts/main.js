@@ -1,31 +1,41 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { createOrbitControls, CameraController } from './cameraControls.js';
 import { getData } from './getAirportData.js';
-import { setUpAutocomplete } from './searchBar.js';
+import { clickMap, setUpAutocomplete } from './searchContainer.js';
 import { setUpCamera, setUpRenderer, setUpStars, setUpBackground } from './setup.js';
 import { sphere, line, drawLines } from './globe.js';
 
-//Global Storage
+//A global singleton store
 export const globalStore = {
   airportData: null,
   airportNames: null,
   startAirport: null,
   endAirport: null,
+  ready: getData().then(({ airportData, airportNames }) => {
+    globalStore.airportData = airportData;
+    globalStore.airportNames = airportNames;
+  })
 };
 
 //Seach Containers
-(async () => {
-  globalStore.airportData, globalStore.airportNames = await getData();
+globalStore.ready.then(function () {
   setUpAutocomplete(globalStore.airportNames, 'input-box-start', '.result-box-start', (value) => {globalStore.startAirport = value;});
   setUpAutocomplete(globalStore.airportNames, 'input-box-end', '.result-box-end', (value) => {globalStore.endAirport = value;});
-})();
+});
+
+//Map and Erase Buttons
+document.querySelector('.map-button button').addEventListener('click', 
+  function () {
+    globalStore.ready.then(function () {
+    let [depMarker, arrMarker] = clickMap(globalStore.startAirport, globalStore.endAirport, cameraController)
+      scene.add(depMarker);
+      scene.add(arrMarker);
+    })
+  }
+);
 
 //Scene
 const scene = new THREE.Scene();
-
-//Camera
-const camera = setUpCamera;
-camera.position.z = 5
 
 //Renderer
 const renderer = setUpRenderer
@@ -38,21 +48,26 @@ scene.add(setUpStars);
 scene.background = setUpBackground
 
 //Globe
-scene.add(sphere)
-scene.add(line)
-scene.add(await drawLines());
+const globeContainer = new THREE.Object3D();
+globeContainer.add(sphere);
+globeContainer.add(line);
+globeContainer.add(await drawLines());
 
-//Orbit Controls
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.02;
+scene.add(globeContainer);
 
+//Camera and Orbit Controls
+const camera = setUpCamera;
+camera.position.z = 5
+
+const cameraController = new CameraController(setUpCamera);
+const controls = createOrbitControls(camera, renderer);
 
 //Animate
 function animate() {
 	requestAnimationFrame(animate);
     setUpStars.rotation.x += 0.0001;
     setUpStars.rotation.y += 0.0001;
+    cameraController.update();
     renderer.render(scene, camera);
     controls.update();
   }

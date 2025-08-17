@@ -2,14 +2,14 @@ import * as THREE from 'three';
 import { drawThreeGeo } from "./threeGeoJSON.js";
 import { globeRadius } from './constants.js';
 
-const geometry = new THREE.SphereGeometry(globeRadius);
+const geometry = new THREE.SphereGeometry(globeRadius, 64, 32);
 const lineMat = new THREE.LineBasicMaterial({ 
   color: 0xffffff,
   transparent: true,
   opacity: 0.15, 
 });
 
-const edges = new THREE.EdgesGeometry(geometry, 1);
+const edges = new THREE.EdgesGeometry(geometry, 0.1);
 export const line = new THREE.LineSegments(edges, lineMat);
 
 const material = new THREE.MeshBasicMaterial( { color: 0x080c10 } ); 

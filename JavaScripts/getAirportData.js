@@ -11,7 +11,6 @@ export async function getData() {
 
     airportData.set(allData[i].name, [allData[i].lon, allData[i].lat]);
     airportNames.push(allData[i].name);
-  }
-
+  }  
   return { airportData, airportNames };
 }
