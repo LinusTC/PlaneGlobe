@@ -215,8 +215,10 @@ export function drawThreeGeo({ json, radius, materalOptions }) {
       verts.push(x_values[i], y_values[i], z_values[i]);
     }
     lineGeo.setPositions(verts);
+    const hue = 0.33 + Math.random() * 0.2
+    const color = new THREE.Color().setHSL(hue, 1, 0.5)
     const lineMaterial = new LineMaterial({
-      color: 0xffffff,
+      color,
       linewidth: 1.5,
     });
 
