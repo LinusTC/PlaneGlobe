@@ -4,8 +4,8 @@ import { getData } from './getAirportData.js';
 import { clickMap, setUpAutocomplete } from './searchContainer.js';
 import { setUpCamera, setUpRenderer, setUpStars, setUpBackground } from './setup.js';
 import { sphere, line, drawLines } from './globe.js';
-import { getLinePoints } from './markers&PathsFunctions.js';
-import { cameraPositionZ } from './constants.js';
+import { createTraveller, getLinePoints } from './markers&PathsFunctions.js';
+import { cameraPositionZ, flightSpeed } from './constants.js';
 
 //A global singleton store
 export const globalStore = {
@@ -19,6 +19,7 @@ export const globalStore = {
   }),
   plottedAirports: new Set(),
   plottedLines: new Set(),
+  travelers: new Set()
 };
 
 //Scene
@@ -56,8 +57,8 @@ globalStore.ready.then(function () {
 });
 
 //Map and Erase Buttons
-const containerLM = new THREE.Object3D();
-scene.add(containerLM)
+const containerLMT = new THREE.Object3D();
+scene.add(containerLMT)
 document.querySelector('.map-button button').addEventListener('click', 
   function () {
     globalStore.ready.then(function () {
@@ -65,19 +66,29 @@ document.querySelector('.map-button button').addEventListener('click',
 
       if(!globalStore.plottedAirports.has(globalStore.depAirport)){
         globalStore.plottedAirports.add(globalStore.depAirport);
-        containerLM.add(depMarker);
+        containerLMT.add(depMarker);
       }
 
       if(!globalStore.plottedAirports.has(globalStore.arrAirport)){
         globalStore.plottedAirports.add(globalStore.arrAirport);
-        containerLM.add(arrMarker);
+        containerLMT.add(arrMarker);
       }
 
-      const [line, points] = getLinePoints(globalStore.depAirport, globalStore.arrAirport);
+      const [line, _, path] = getLinePoints(globalStore.depAirport, globalStore.arrAirport);
       const lineKey = getLineKey(globalStore.depAirport, globalStore.arrAirport);
       if (!globalStore.plottedLines.has(lineKey)) {
-          globalStore.plottedLines.add(lineKey); // store the key
-          containerLM.add(line);
+        globalStore.plottedLines.add(lineKey);
+        containerLMT.add(line);
+
+        // traveler sphere
+        const traveler = createTraveller();        
+        globalStore.travelers.add({
+          mesh: traveler,
+          path: path,
+          length: path.getLength(),
+          traveled: 0
+        });
+        containerLMT.add(traveler);
       }
     })
   }
@@ -87,16 +98,23 @@ document.querySelector('.erase-button button').addEventListener('click',
   function () {
     globalStore.plottedAirports.clear();
     globalStore.plottedLines.clear()
-    while (containerLM.children.length > 0) {
-      const child = containerLM.children[0];
-      containerLM.remove(child);
+    globalStore.travelers.clear()
+    while (containerLMT.children.length > 0) {
+      const child = containerLMT.children[0];
+      containerLMT.remove(child);
     }
   }
 );
 
 //Animate
+const clock = new THREE.Clock();
+
 function animate() {
 	requestAnimationFrame(animate);
+    const delta = clock.getDelta(); 
+    globalStore.travelers.forEach((travelerObj) => {
+      travellerAnimation(travelerObj, delta);
+    });
     setUpStars.rotation.x += 0.0001;
     setUpStars.rotation.y += 0.0001;
     cameraController.update();
@@ -108,4 +126,15 @@ animate();
 //Line name between two airports
 function getLineKey(dep, arr) {
   return [dep, arr].sort().join(' to ');
+}
+
+//Traveller Animation
+function travellerAnimation (object, delta){
+  object.traveled += flightSpeed * delta; 
+  let t = object.traveled / object.length;
+  if (t > 1) {
+    object.traveled = 0;
+  }
+  const pos = object.path.getPointAt(t);
+  object.mesh.position.copy(pos);
 }

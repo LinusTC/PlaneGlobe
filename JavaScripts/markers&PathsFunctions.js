@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { globeRadius } from "./constants.js";
+import { globeRadius, flightSpeed } from "./constants.js";
 import { globalStore } from "./main.js";
 
 export function getXYZCoordinate(lon, lat) {
@@ -68,7 +68,15 @@ export function getLinePoints(depAirport, arrAirport) {
     const material = new THREE.MeshBasicMaterial({ vertexColors: true });
     const line = new THREE.Mesh(geometry, material);
 
-    return [line, points];
+    return [line, points, path];
+}
+
+export function createTraveller (){
+    const travelerGeom = new THREE.SphereGeometry(0.05, 16, 16);
+    const travelerMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const traveler = new THREE.Mesh(travelerGeom, travelerMat);
+
+    return traveler;
 }
 
 // Convert lon/lat to unit vector
