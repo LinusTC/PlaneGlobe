@@ -8,7 +8,7 @@ import { getLinePoints } from './markers&PathsFunctions.js';
 import { cameraPositionZ, flightSpeed } from './constants.js';
 import { createTraveller } from './planeObject.js';
 
-//A global singleton store
+//Global store
 export const globalStore = {
   airportData: null,
   airportNames: null,
@@ -98,8 +98,10 @@ document.querySelector('.map-button button').addEventListener('click',
 document.querySelector('.erase-button button').addEventListener('click', 
   function () {
     globalStore.plottedAirports.clear();
-    globalStore.plottedLines.clear()
-    globalStore.travelers.clear()
+    globalStore.plottedLines.clear();
+    globalStore.travelers.clear();
+    globalStore.depAirport = null;
+    globalStore.arrAirport = null;
     while (containerLMT.children.length > 0) {
       const child = containerLMT.children[0];
       containerLMT.remove(child);
