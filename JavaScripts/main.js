@@ -5,13 +5,19 @@ import { setUpAutocomplete } from './searchBar.js';
 import { setUpCamera, setUpRenderer, setUpStars, setUpBackground } from './setup.js';
 import { sphere, line, drawLines } from './globe.js';
 
+//Global Storage
+export const globalStore = {
+  airportData: null,
+  airportNames: null,
+  startAirport: null,
+  endAirport: null,
+};
+
 //Seach Containers
-let startAirport;
-let endAirport;
 (async () => {
-  const { airportData, airportNames } = await getData();
-  setUpAutocomplete(airportNames, 'input-box-start', '.result-box-start', (value) => {startAirport = value;});
-  setUpAutocomplete(airportNames, 'input-box-end', '.result-box-end', (value) => {endAirport = value;});
+  globalStore.airportData, globalStore.airportNames = await getData();
+  setUpAutocomplete(globalStore.airportNames, 'input-box-start', '.result-box-start', (value) => {globalStore.startAirport = value;});
+  setUpAutocomplete(globalStore.airportNames, 'input-box-end', '.result-box-end', (value) => {globalStore.endAirport = value;});
 })();
 
 //Scene
