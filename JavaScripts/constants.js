@@ -1,1 +1,1 @@
-export const globeRadius = 2;
+export const globeRadius = 3;

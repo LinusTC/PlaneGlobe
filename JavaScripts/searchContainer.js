@@ -1,5 +1,5 @@
 import { globalStore } from "./main.js";
-import { createMarker, getXYZCoordinate } from "./points&paths.js";
+import { createMarker, getXYZCoordinate } from "./markers&PathsFunctions.js";
 import * as THREE from 'three';
 import { CameraController } from "./cameraControls.js";
 

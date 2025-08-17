@@ -28,3 +28,7 @@ export function createMarker(lon, lat, radius = 0.03, color = 0x00ff00) {
 
     return circle;
 }
+
+export function removeMarker(){
+
+}

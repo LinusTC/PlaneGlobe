@@ -1,6 +1,6 @@
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import * as THREE from 'three';
-import { getXYZCoordinate } from './points&paths.js';
+import { getXYZCoordinate } from './markers&PathsFunctions.js';
 
 export class CameraController {
   constructor(camera) {
