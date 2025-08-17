@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { drawThreeGeo } from "./threeGeoJSON.js";
-import { globeRadius } from './main.js';
+import { globeRadius } from './constants.js';
 
 const geometry = new THREE.SphereGeometry(globeRadius);
 const lineMat = new THREE.LineBasicMaterial({ 
