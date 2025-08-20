@@ -51,6 +51,8 @@ camera.position.z = cameraPositionZ;
 const cameraController = new CameraController(setUpCamera);
 const controls = createOrbitControls(camera, renderer);
 
+controls.addEventListener('start', () => {cameraController.isMoving = false; });
+
 //Seach Containers
 globalStore.ready.then(function () {
   setUpAutocomplete(globalStore.airportNames, 'input-box-start', '.result-box-start', (value) => {globalStore.depAirport = value;});
