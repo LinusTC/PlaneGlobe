@@ -12,8 +12,8 @@ import { createTraveller } from './planeObject.js';
 export const globalStore = {
   airportData: null,
   airportNames: null,
-  depAirport: null,
-  arrAirport: null,
+  depAirport: "London Heathrow Airport",
+  arrAirport: "Hong Kong International Airport",
   ready: getData().then(({ airportData, airportNames }) => {
     globalStore.airportData = airportData;
     globalStore.airportNames = airportNames;
@@ -25,6 +25,11 @@ export const globalStore = {
 
 //Scene
 const scene = new THREE.Scene();
+const ambientLight = new THREE.AmbientLight(0xffffff, 3);
+scene.add(ambientLight);
+const axesHelper = new THREE.AxesHelper( 10 );
+axesHelper.setColors(0xff0000, 0x00ff00, 0x0000ff)
+scene.add( axesHelper );
 
 //Renderer
 const renderer = setUpRenderer
@@ -102,8 +107,6 @@ document.querySelector('.erase-button button').addEventListener('click',
     globalStore.plottedAirports.clear();
     globalStore.plottedLines.clear();
     globalStore.travelers.clear();
-    globalStore.depAirport = null;
-    globalStore.arrAirport = null;
     while (containerLMT.children.length > 0) {
       const child = containerLMT.children[0];
       containerLMT.remove(child);
@@ -134,12 +137,26 @@ function getLineKey(dep, arr) {
 }
 
 //Traveller Animation
-function travellerAnimation (object, delta){
+function travellerAnimation(object, delta) {
   object.traveled += flightSpeed * delta; 
   let t = object.traveled / object.length;
   if (t > 1) {
     object.traveled = 0;
+    t = 0;
   }
+
   const pos = object.path.getPointAt(t);
+  const tangent = object.path.getTangentAt(t).normalize();
+  const toCenter = new THREE.Vector3(0,0,0).sub(pos).normalize();
+
+  const right = new THREE.Vector3().crossVectors(toCenter, tangent).normalize();
+  const up    = new THREE.Vector3().crossVectors(tangent, right).normalize();
+
+  const m = new THREE.Matrix4();
+  m.makeBasis(right, up, tangent);
+
+  object.mesh.setRotationFromMatrix(m);
+  object.mesh.rotateY(-Math.PI/2)
+  object.mesh.rotateX(Math.PI/2)
   object.mesh.position.copy(pos);
 }

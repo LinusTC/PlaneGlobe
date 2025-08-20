@@ -48,6 +48,7 @@ export function clickMap(depAirport, arrAirport, CameraController){
     const arr = createMarker(arrLon, arrLat);
 
     CameraController.moveToAirport(depLon, depLat);
+    console.log([dep, arr])
 
     return [dep, arr]
   }
