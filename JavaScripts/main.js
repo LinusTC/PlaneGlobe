@@ -27,9 +27,6 @@ export const globalStore = {
 const scene = new THREE.Scene();
 const ambientLight = new THREE.AmbientLight(0xffffff, 3);
 scene.add(ambientLight);
-const axesHelper = new THREE.AxesHelper( 10 );
-axesHelper.setColors(0xff0000, 0x00ff00, 0x0000ff)
-scene.add( axesHelper );
 
 //Renderer
 const renderer = setUpRenderer
