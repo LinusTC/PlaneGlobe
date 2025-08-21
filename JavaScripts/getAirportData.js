@@ -1,16 +1,41 @@
-export async function getData() {
-  const response = await fetch('./data/airports2.json');
+export async function getAirportData() {
+  const response = await fetch('./data/airports.json');
   const allData = await response.json();
 
   const airportData = new Map();
-  const airportNames = [];
+  const airportCodes = new Map();
   
-  for (let i = 0; i < allData.length; i++) {
-    if (allData[i].status == 0) continue;
-    if (allData[i].lon == null || allData[i].lat == null || allData[i].name == null) continue;
+  for (const airportKey in allData) {
+    if (allData[airportKey].status == 0) continue;
+    if (!allData[airportKey].lon|| !allData[airportKey].lat|| !allData[airportKey].name|| !allData[airportKey].iata) continue;
 
-    airportData.set(allData[i].name, [allData[i].lon, allData[i].lat]);
-    airportNames.push(allData[i].name);
+    airportData.set(allData[airportKey].iata, [allData[airportKey].name, [allData[airportKey].lon, allData[airportKey].lat]]);
+    airportCodes.set(allData[airportKey].iata, allData[airportKey].name);
   }  
-  return { airportData, airportNames };
+  return { airportData, airportCodes };
+}
+
+export async function getRouteData() {
+  const response = await fetch("./data/routes.dat");
+  const text = await response.text();
+
+  const lines = text.split("\n").filter(line => line.trim() !== "");
+
+  const routes = lines.map(line => {
+    const parts = line.split(",");
+    return [parts[2], parts[4]];
+  });
+
+  const uniqueRoutesMap = new Map();
+
+  routes.forEach(([dep, arr]) => {
+    const key = [dep, arr].sort().join("-");
+    if (!uniqueRoutesMap.has(key)) {
+      uniqueRoutesMap.set(key, [dep, arr]);
+    }
+  });
+
+  const uniqueRoutes = Array.from(uniqueRoutesMap.values());
+
+  return uniqueRoutes;
 }

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { createOrbitControls, CameraController } from './cameraControls.js';
-import { getData } from './getAirportData.js';
+import { getAirportData, getRouteData } from './getAirportData.js';
 import { clearSearchBar, clickMap, setUpAutocomplete } from './searchContainer.js';
 import { setUpCamera, setUpRenderer, setUpStars, setUpBackground } from './setup.js';
 import { sphere, line, drawLines } from './globe.js';
@@ -11,17 +11,23 @@ import { createTraveller } from './planeObject.js';
 //Global store
 export const globalStore = {
   airportData: null,
-  airportNames: null,
-  depAirport: "London Heathrow Airport",
-  arrAirport: "Hong Kong International Airport",
-  ready: getData().then(({ airportData, airportNames }) => {
-    globalStore.airportData = airportData;
-    globalStore.airportNames = airportNames;
-  }),
+  airportCodes: null,
+  depAirport: "EDI",
+  arrAirport: "HKT",
+  uniqueRoutes: null,
   plottedAirports: new Set(),
   plottedLines: new Set(),
-  travelers: new Set()
+  travelers: new Set(),
+
+  ready: Promise.all([getAirportData(), getRouteData()])
+    .then(function([airportResult, routeResult]) {
+      const { airportData, airportCodes } = airportResult;
+      globalStore.airportData = airportData;
+      globalStore.airportCodes = airportCodes;
+      globalStore.uniqueRoutes = routeResult;
+    })
 };
+
 
 //Scene
 const scene = new THREE.Scene();
@@ -53,12 +59,12 @@ camera.position.z = cameraPositionZ;
 const cameraController = new CameraController(setUpCamera);
 const controls = createOrbitControls(camera, renderer);
 
-controls.addEventListener('start', () => {cameraController.isMoving = false; });
+controls.addEventListener('start', function () {cameraController.isMoving = false; });
 
 //Seach Containers
 globalStore.ready.then(function () {
-  setUpAutocomplete(globalStore.airportNames, 'input-box-start', '.result-box-start', (value) => {globalStore.depAirport = value;});
-  setUpAutocomplete(globalStore.airportNames, 'input-box-end', '.result-box-end', (value) => {globalStore.arrAirport = value;});
+  setUpAutocomplete(globalStore.airportCodes, 'input-box-start', '.result-box-start', function (value) {globalStore.depAirport = value;});
+  setUpAutocomplete(globalStore.airportCodes, 'input-box-end', '.result-box-end', function (value) {globalStore.arrAirport = value;});
 });
 
 //Map and Erase Buttons
@@ -67,33 +73,39 @@ scene.add(containerLMT)
 document.querySelector('.map-button button').addEventListener('click', 
   function () {
     globalStore.ready.then(function () {
-      const [depMarker, arrMarker] = clickMap(globalStore.depAirport, globalStore.arrAirport, cameraController)
+      const markerPairs = clickMap(globalStore.depAirport, globalStore.arrAirport, cameraController)
 
-      if(!globalStore.plottedAirports.has(globalStore.depAirport)){
-        globalStore.plottedAirports.add(globalStore.depAirport);
-        containerLMT.add(depMarker);
-      }
+      for (const [depPair, arrPair] of markerPairs) {
+        const [[currDepAirport, depMarker]] = Object.entries(depPair);
+        const [[currArrAirport, currArrMesh]] = Object.entries(arrPair);
 
-      if(!globalStore.plottedAirports.has(globalStore.arrAirport)){
-        globalStore.plottedAirports.add(globalStore.arrAirport);
-        containerLMT.add(arrMarker);
-      }
+        if(!globalStore.plottedAirports.has(currDepAirport)){
+          globalStore.plottedAirports.add(currDepAirport);
+          containerLMT.add(depMarker);
+        }
 
-      const [line, _, path] = getLinePoints(globalStore.depAirport, globalStore.arrAirport);
-      const lineKey = getLineKey(globalStore.depAirport, globalStore.arrAirport);
-      if (!globalStore.plottedLines.has(lineKey)) {
-        globalStore.plottedLines.add(lineKey);
-        containerLMT.add(line);
+        if(!globalStore.plottedAirports.has(currArrAirport)){
+          globalStore.plottedAirports.add(currArrAirport);
+          containerLMT.add(currArrMesh);
+        }
+        const [line, _, path] = getLinePoints(currDepAirport, currArrAirport);
+        const lineKey = getLineKey(currDepAirport, currArrAirport);
+        if (!globalStore.plottedLines.has(lineKey)) {
+          globalStore.plottedLines.add(lineKey);
+          containerLMT.add(line);
 
-        // traveler sphere
-        const traveler = createTraveller();        
-        globalStore.travelers.add({
-          mesh: traveler,
-          path: path,
-          length: path.getLength(),
-          traveled: 0
-        });
-        containerLMT.add(traveler);
+          // traveler sphere
+          if(globalStore.arrAirport){
+            const traveler = createTraveller();        
+            globalStore.travelers.add({
+              mesh: traveler,
+              path: path,
+              length: path.getLength(),
+              traveled: 0
+            });
+            containerLMT.add(traveler);
+          }
+        }
       }
     })
   }
@@ -121,7 +133,7 @@ const clock = new THREE.Clock();
 function animate() {
 	requestAnimationFrame(animate);
     const delta = clock.getDelta(); 
-    globalStore.travelers.forEach((travelerObj) => {
+    globalStore.travelers.forEach(function (travelerObj) {
       travellerAnimation(travelerObj, delta);
     });
     setUpStars.rotation.x += 0.0001;

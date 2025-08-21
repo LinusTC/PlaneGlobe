@@ -21,7 +21,7 @@ export function createTraveller() {
                 objLoader.load(
                     './data/Airplane Model/11803_Airplane_v1_l1.obj',
                     function (obj) {
-                        obj.scale.set(0.0001, 0.0001, 0.0001);
+                        obj.scale.set(0.00005, 0.00005, 0.00005);
                         group.add(obj);
                         cachePlane = obj;
                     }

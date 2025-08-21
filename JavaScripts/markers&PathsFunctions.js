@@ -33,10 +33,10 @@ export function createMarker(lon, lat, radius = 0.03, color = 0x00ff00) {
 export function getLinePoints(depAirport, arrAirport) {
     const numPoints = 180;
 
-    const depAirportCoords = globalStore.airportData.get(depAirport);
+    const depAirportCoords = globalStore.airportData.get(depAirport)[1];
     const [depLon, depLat] = depAirportCoords;
 
-    const arrAirportCoords = globalStore.airportData.get(arrAirport);
+    const arrAirportCoords = globalStore.airportData.get(arrAirport)[1];
     const [arrLon, arrLat] = arrAirportCoords;
 
     // Convert lon/lat to unit vectors (ignore globeRadius here)
