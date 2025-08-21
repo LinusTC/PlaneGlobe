@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { createOrbitControls, CameraController } from './cameraControls.js';
 import { getData } from './getAirportData.js';
-import { clickMap, setUpAutocomplete } from './searchContainer.js';
+import { clearSearchBar, clickMap, setUpAutocomplete } from './searchContainer.js';
 import { setUpCamera, setUpRenderer, setUpStars, setUpBackground } from './setup.js';
 import { sphere, line, drawLines } from './globe.js';
 import { getLinePoints } from './markers&PathsFunctions.js';
@@ -104,6 +104,10 @@ document.querySelector('.erase-button button').addEventListener('click',
     globalStore.plottedAirports.clear();
     globalStore.plottedLines.clear();
     globalStore.travelers.clear();
+    globalStore.arrAirport = null;
+    globalStore.depAirport = null;
+    clearSearchBar('input-box-start');
+    clearSearchBar('input-box-end');
     while (containerLMT.children.length > 0) {
       const child = containerLMT.children[0];
       containerLMT.remove(child);

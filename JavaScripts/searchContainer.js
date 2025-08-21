@@ -24,11 +24,11 @@ export function setUpAutocomplete(airportNames, inputId, resultsBoxSelector, onS
       .map((list) => `<li>${list}</li>`)
       .join('')}</ul>`;
 
-    resultsBox.querySelectorAll('li').forEach((li) => {
-      li.addEventListener('click', () => {
-        inputBox.value = li.textContent;
+    resultsBox.querySelectorAll('li').forEach(function(item) {
+      item.addEventListener('click', function() {
+        inputBox.value = item.textContent;
         resultsBox.innerHTML = '';
-        if (onSelect) onSelect(li.textContent);
+        if (onSelect) onSelect(item.textContent);
       });
     });
   }
@@ -51,4 +51,9 @@ export function clickMap(depAirport, arrAirport, CameraController){
 
     return [dep, arr]
   }
+}
+
+export function clearSearchBar(inputId){
+  const inputBox = document.getElementById(inputId);
+  inputBox.value = '';
 }

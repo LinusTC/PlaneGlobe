@@ -1,5 +1,5 @@
 export async function getData() {
-  const response = await fetch('./data/airports.json');
+  const response = await fetch('./data/airports2.json');
   const allData = await response.json();
 
   const airportData = new Map();
