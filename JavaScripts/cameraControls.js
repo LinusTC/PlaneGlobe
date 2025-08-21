@@ -23,12 +23,12 @@ export class CameraController {
   update() {
     if (!this.isMoving) return;
     // Smoothly move camera position
-    this.camera.position.lerp(this.targetPos, 0.03);
+    this.camera.position.lerp(this.targetPos, 0.05);
 
     // Smoothly adjust lookAt
     const currentLookAt = new THREE.Vector3();
     this.camera.getWorldDirection(currentLookAt).add(this.camera.position);
-    currentLookAt.lerp(this.targetLookAt, 0.03);
+    currentLookAt.lerp(this.targetLookAt, 0.05);
     this.camera.lookAt(currentLookAt);
 
     // Stop moving if close enough

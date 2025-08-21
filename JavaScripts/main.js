@@ -12,8 +12,7 @@ import { createTraveller } from './planeObject.js';
 export const globalStore = {
   airportData: null,
   airportCodes: null,
-  depAirport: "HKG",
-  arrAirport: "",
+  airports: new Map([[-1, "HKT"]]),
   uniqueRoutes: null,
   plottedAirports: new Set(),
   plottedLines: new Set(),
@@ -56,15 +55,15 @@ scene.add(globeContainer);
 const camera = setUpCamera;
 camera.position.z = cameraPositionZ;
 
-const cameraController = new CameraController(setUpCamera);
+const cameraController = new CameraController(camera);
 const controls = createOrbitControls(camera, renderer);
 
 controls.addEventListener('start', function () {cameraController.isMoving = false; });
 
 //Seach Containers
 globalStore.ready.then(function () {
-  setUpAutocomplete(globalStore.airportCodes, 'input-box-start', '.result-box-start', function (value) {globalStore.depAirport = value;});
-  setUpAutocomplete(globalStore.airportCodes, 'input-box-end', '.result-box-end', function (value) {globalStore.arrAirport = value;});
+  setUpAutocomplete(globalStore.airportCodes, 'input-box-start', '.result-box-start', function (value) {globalStore.airports.set(-1, value);});
+  setUpAutocomplete(globalStore.airportCodes, 'input-box-end', '.result-box-end', function (value) {globalStore.airports.set(0, value);});
 });
 
 //Map and Erase Buttons
@@ -73,7 +72,8 @@ scene.add(containerLMT)
 document.querySelector('.map-button button').addEventListener('click', 
   function () {
     globalStore.ready.then(function () {
-      const markerPairs = clickMap(globalStore.depAirport, globalStore.arrAirport, cameraController)
+      const toVisitAirports = globalStore.airports;
+      const markerPairs = clickMap(toVisitAirports, cameraController)
 
       for (const [depPair, arrPair] of markerPairs) {
         const [[currDepAirport, depMarker]] = Object.entries(depPair);
@@ -94,8 +94,8 @@ document.querySelector('.map-button button').addEventListener('click',
           globalStore.plottedLines.add(lineKey);
           containerLMT.add(line);
 
-          // traveler sphere
-          if(globalStore.arrAirport){
+          // traveler
+          if(globalStore.airports.size > 1){
             const traveler = createTraveller();        
             globalStore.travelers.add({
               mesh: traveler,
@@ -116,8 +116,7 @@ document.querySelector('.erase-button button').addEventListener('click',
     globalStore.plottedAirports.clear();
     globalStore.plottedLines.clear();
     globalStore.travelers.clear();
-    globalStore.arrAirport = null;
-    globalStore.depAirport = null;
+    globalStore.airports.clear();
     clearSearchBar('input-box-start');
     clearSearchBar('input-box-end');
     while (containerLMT.children.length > 0) {
@@ -133,9 +132,11 @@ const clock = new THREE.Clock();
 function animate() {
 	requestAnimationFrame(animate);
     const delta = clock.getDelta(); 
-    globalStore.travelers.forEach(function (travelerObj) {
-      travellerAnimation(travelerObj, delta);
-    });
+    if (!cameraController.isMoving){
+      globalStore.travelers.forEach(function (travelerObj) {
+        travellerAnimation(travelerObj, delta);
+      });
+    }
     setUpStars.rotation.x += 0.0001;
     setUpStars.rotation.y += 0.0001;
     cameraController.update();

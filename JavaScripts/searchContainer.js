@@ -35,10 +35,10 @@ export function setUpAutocomplete(airportCodes, inputId, resultsBoxSelector, onS
 }
 
 
-export function clickMap(depAirport, arrAirport, CameraController){
-  if (!depAirport && !arrAirport)return;
-
-  if (!arrAirport){
+export function clickMap(toVisitAirports, CameraController){
+  if (!toVisitAirports)return;
+  const depAirport = toVisitAirports.get(-1);
+  if (!toVisitAirports.get(0)){
     let airportArray = []
     const [depLon, depLat] = globalStore.airportData.get(depAirport)[1];
     const dep = createMarker(depLon, depLat);
@@ -53,7 +53,6 @@ export function clickMap(depAirport, arrAirport, CameraController){
     }
     
     for (const airport of arrAirports){
-      console.log(airport)
       if (!globalStore.airportCodes.has(airport))continue;
       const [arrLon, arrLat] = globalStore.airportData.get(airport)[1];
       const arr = createMarker(arrLon, arrLat);
