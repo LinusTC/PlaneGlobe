@@ -37,13 +37,15 @@ export function setUpAutocomplete(airportCodes, inputId, resultsBoxSelector, onS
 
 export function clickMap(toVisitAirports, CameraController){
   if (!toVisitAirports)return;
-  const depAirport = toVisitAirports.get(-1);
-  if (!toVisitAirports.get(0)){
-    let airportArray = []
-    const [depLon, depLat] = globalStore.airportData.get(depAirport)[1];
-    const dep = createMarker(depLon, depLat);
-    CameraController.moveToAirport(depLon, depLat);
+  let airportArray = []
 
+  //Departure Airport Setup
+  const depAirport = toVisitAirports.get(-1);
+  const [depLon, depLat] = globalStore.airportData.get(depAirport)[1];
+  const dep = createMarker(depLon, depLat, undefined, 0x0000ff);
+  CameraController.moveToAirport(depLon, depLat);
+
+  if (!toVisitAirports.get(0)){
     let arrAirports = []
     for (const route of globalStore.uniqueRoutes){
       if (route[0] === depAirport || route[1] === depAirport){
@@ -63,21 +65,19 @@ export function clickMap(toVisitAirports, CameraController){
     return airportArray;
   }
 
-  const depAirportCoords = globalStore.airportData.get(depAirport)[1];
-  const [depLon, depLat] = depAirportCoords;
+  for (let i = 0; i < toVisitAirports.size - 1 ;i++){
+    const currAirport = toVisitAirports.get(i)
+    const arrAirportCoords = globalStore.airportData.get(currAirport)[1];
+    const [arrLon, arrLat] = arrAirportCoords;
 
-  const arrAirportCoords = globalStore.airportData.get(arrAirport)[1];
-  const [arrLon, arrLat] = arrAirportCoords;
+    const arr = createMarker(arrLon, arrLat);
 
-  const dep = createMarker(depLon, depLat);
-  const arr = createMarker(arrLon, arrLat);
+    const depPair = {[depAirport]: dep};
+    const arrPair = {[currAirport]: arr};
+    airportArray.push([depPair, arrPair])
+  }
 
-  CameraController.moveToAirport(depLon, depLat);
-
-  const depPair = {[depAirport]: dep};
-  const arrPair = {[arrAirport]: arr};
-
-  return [[depPair, arrPair]]
+  return airportArray;
 }
 
 export function clearSearchBar(inputId){

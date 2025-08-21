@@ -47,26 +47,26 @@ export function getLinePoints(depAirport, arrAirport) {
 
     for (let i = 0; i <= numPoints; i++) {
         const t = i / numPoints;
-        const interpolatedVec = slerp(startVec, endVec, t);
-        const radius = globeRadius + Math.sin(t * Math.PI) * 0.2;
-        const [x, y, z] = interpolatedVec.map(v => v * radius);
+        const normalizedVector = slerp(startVec, endVec, t);
+        const radius = globeRadius + Math.sin(t * Math.PI) * 0.3;
+        const [x, y, z] = normalizedVector.map(function(v) {return v * radius});
         points.push(new THREE.Vector3(x, y, z));
     }
 
     const path = new THREE.CatmullRomCurve3(points);
-    const geometry = new THREE.TubeGeometry(path, 64, 0.003, 8, false);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
     const colors = [];
     const colorStart = new THREE.Color(0xFF8B00);
     const colorEnd = new THREE.Color(0x0200C6);
-    for (let i = 0; i < geometry.attributes.position.count; i++) {
-        const t = i / (geometry.attributes.position.count - 1);
-        let color = new THREE.Color();
-        color = colorStart.clone().lerp(colorEnd, t);
+    for (let i = 0; i < points.length; i++) {
+        const t = i / (points.length - 1);
+        const color = colorStart.clone().lerp(colorEnd, t);
         colors.push(color.r, color.g, color.b);
     }
     geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    const material = new THREE.MeshBasicMaterial({ vertexColors: true });
-    const line = new THREE.Mesh(geometry, material);
+    const material = new THREE.LineBasicMaterial({ vertexColors: true});
+    const line = new THREE.Line(geometry, material);
 
     return [line, points, path];
 }

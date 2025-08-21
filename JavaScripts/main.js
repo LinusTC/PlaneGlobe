@@ -12,10 +12,10 @@ import { createTraveller } from './planeObject.js';
 export const globalStore = {
   airportData: null,
   airportCodes: null,
-  airports: new Map([[-1, "HKT"]]),
+  airports: new Map([[-1, "HKG"]]),
   uniqueRoutes: null,
   plottedAirports: new Set(),
-  plottedLines: new Set(),
+  plottedLines: new Map(),
   travelers: new Set(),
 
   ready: Promise.all([getAirportData(), getRouteData()])
@@ -91,7 +91,13 @@ document.querySelector('.map-button button').addEventListener('click',
         const [line, _, path] = getLinePoints(currDepAirport, currArrAirport);
         const lineKey = getLineKey(currDepAirport, currArrAirport);
         if (!globalStore.plottedLines.has(lineKey)) {
-          globalStore.plottedLines.add(lineKey);
+          globalStore.plottedLines.set(lineKey,{
+            mesh: line,
+            totalPoints: line.geometry.attributes.position.count,
+            elapsed: 0,
+            duration: 2
+          });
+          line.geometry.setDrawRange(0,0);
           containerLMT.add(line);
 
           // traveler
@@ -137,6 +143,17 @@ function animate() {
         travellerAnimation(travelerObj, delta);
       });
     }
+
+    globalStore.plottedLines.forEach(function(tempLine){
+      if (tempLine.elapsed < tempLine.duration) {
+          tempLine.elapsed += delta;
+          const progress = Math.min(tempLine.elapsed / tempLine.duration, 1);
+          const count = Math.floor(tempLine.totalPoints * progress);
+          tempLine.mesh.geometry.setDrawRange(0, count);
+          tempLine.mesh.geometry.attributes.position.needsUpdate = true;
+      }
+    });
+
     setUpStars.rotation.x += 0.0001;
     setUpStars.rotation.y += 0.0001;
     cameraController.update();
