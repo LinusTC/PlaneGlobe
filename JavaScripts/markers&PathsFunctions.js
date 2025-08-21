@@ -13,7 +13,7 @@ export function getXYZCoordinate(lon, lat) {
     return [x, y, z];
 }
 
-export function createMarker(lon, lat, radius = 0.03, color = 0x00ff00) {
+export function createMarker(lon, lat, radius = 0.015, color = 0xff0000) {
     const [x, y, z] = getXYZCoordinate(lon, lat);
 
     // Create a flat circle
@@ -48,13 +48,13 @@ export function getLinePoints(depAirport, arrAirport) {
     for (let i = 0; i <= numPoints; i++) {
         const t = i / numPoints;
         const interpolatedVec = slerp(startVec, endVec, t);
-        const radius = globeRadius + Math.sin(t * Math.PI) * 0.35;
+        const radius = globeRadius + Math.sin(t * Math.PI) * 0.2;
         const [x, y, z] = interpolatedVec.map(v => v * radius);
         points.push(new THREE.Vector3(x, y, z));
     }
 
     const path = new THREE.CatmullRomCurve3(points);
-    const geometry = new THREE.TubeGeometry(path, 64, 0.01, 8, false);
+    const geometry = new THREE.TubeGeometry(path, 64, 0.003, 8, false);
     const colors = [];
     const colorStart = new THREE.Color(0xFF8B00);
     const colorEnd = new THREE.Color(0x0200C6);

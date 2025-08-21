@@ -12,8 +12,8 @@ import { createTraveller } from './planeObject.js';
 export const globalStore = {
   airportData: null,
   airportCodes: null,
-  depAirport: "EDI",
-  arrAirport: "HKT",
+  depAirport: "HKG",
+  arrAirport: "",
   uniqueRoutes: null,
   plottedAirports: new Set(),
   plottedLines: new Set(),
